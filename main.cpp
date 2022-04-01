@@ -15,10 +15,14 @@ int main(int argc, char* argv[]) {
     LinkedList<int> a{};
     a.push_front(5);
     a.push_front(3);
+    a.push_front(7);
+    a.push_front(13);
 
-    int b = 2;
-    std::vector<int> c;
     std::cout << a << std::endl;
+
+    for (auto it = a.begin(); it != a.end(); ++it) {
+        std::cout << *it << ", ";
+    }
 
     return 0;
 }
