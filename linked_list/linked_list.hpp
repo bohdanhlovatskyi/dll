@@ -60,7 +60,8 @@ public:
         }
     }
 
-    class LLIterator : public std::iterator<std::forward_iterator_tag, T>{
+    // TODO: extend this: https://stackoverflow.com/questions/23987196/sort-linked-list-in-c-by-using-stdsort
+    class LLIterator : public std::iterator<std::bidirectional_iterator_tag, T>{
 
     private:
         std::shared_ptr<Node<T>> curr_;
