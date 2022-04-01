@@ -24,6 +24,11 @@ bool operator==(Node<T> lhs, Node<T> rhs) {
 }
 
 template<typename T>
+bool operator<=>(Node<T> lhs, Node<T> rhs) {
+    return lhs.data_ <=> rhs.data_;
+}
+
+template<typename T>
 std::ostream& operator<<(std::ostream& os, Node<T> node) {
     return os << "{" << node.data_ << "}";
 }
@@ -34,9 +39,6 @@ private:
     std::shared_ptr<Node<T>> head_;
     std::shared_ptr<Node<T>> tail_;
 public:
-
-    // forward declaration of iterator class
-    class Iterator;
 
     // TODO: why does this not work
     // LinkedList(): head_{new Node<T>{}}, tail_{new Node<T>{}} {}
@@ -58,15 +60,16 @@ public:
         }
     }
 
-    class LLIterator : public std::iterator<std::input_iterator_tag, Node<T>>{
+    class LLIterator : public std::iterator<std::forward_iterator_tag, T>{
+
     private:
         std::shared_ptr<Node<T>> curr_;
 
     public:
         LLIterator(std::shared_ptr<Node<T>> node): curr_{node} {}
 
-        Node<T> operator*() const {
-            return *curr_;
+        T operator*() const {
+            return curr_->data_;
         }
 
         LLIterator& operator++() {
@@ -74,7 +77,13 @@ public:
             return *this;
         }
 
-        Iterator& operator=(std::shared_ptr<Node<T>> node) {
+        LLIterator operator++(int) {
+            if (curr_)
+                return LLIterator{curr_->next};
+            return LLIterator{};
+        }
+
+        LLIterator& operator=(std::shared_ptr<Node<T>> node) {
             curr_ = node;
             return *this;
         }
