@@ -2,10 +2,23 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: http://www.viva64.com
 
 #include <iostream>
-#include "options_parser.h"
+#include <vector>
+
+#include <linked_list.hpp>
 
 int main(int argc, char* argv[]) {
-    command_line_options_t command_line_options{argc, argv};
-    std::cout << "A flag value: " << command_line_options.get_A_flag() << std::endl;
+    (void) argc; (void) argv;
+
+
+    Node<int> n{5};
+
+    LinkedList<int> a{};
+    a.push_front(5);
+    a.push_front(3);
+
+    int b = 2;
+    std::vector<int> c;
+    std::cout << a << std::endl;
+
     return 0;
 }
