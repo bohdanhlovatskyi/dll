@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <vector>
+#include <list>
 
 #include <linked_list.hpp>
 
@@ -13,20 +15,14 @@ int main(int argc, char* argv[]) {
     Node<int> n{5};
 
     LinkedList<int> a{};
-    a.push_front(7);
-    a.push_front(3);
-    a.push_front(5);
-    a.push_front(1);
+    a.push_back(7);
+    a.push_back(3);
+    a.push_back(5);
+    a.push_back(1);
 
     std::cout << a << std::endl;
 
-    for (auto it = a.begin(); it != a.end(); ++it) {
-        std::cout << *it << ", ";
-    }
-    std::cout << std::endl;
-
-    auto res = std::find(a.begin(), a.end(), 5);
-    std::cout << *res << std::endl;
+    // a.sort([](auto c, auto b){ return c > b; });
 
     for (auto it = a.begin(); it != a.end(); ++it) {
         std::cout << *it << ", ";
