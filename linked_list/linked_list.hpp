@@ -129,6 +129,12 @@ public:
         return remove_(*it);
     }
 
+    template<class Callable>
+    Node<T> remove_if(Callable call) {
+        auto it = std::find_if(this->begin(), this->end(), call);
+        return remove_(*it);
+    }
+
     template<class Compare>
     void sort(Compare comp) {
         if (head_ == nullptr || head_ == tail_) {
@@ -144,9 +150,10 @@ public:
         while (cur != nullptr) {
             auto b = cur->next_;
             while (b != nullptr && b->prev_  != nullptr && \
-                   comp(b->data_, b->prev_->data_)) {
-                   std::swap(b->data_, b->prev_->data_);
-                    b = b->prev_;
+                   comp(b->data_, b->prev_->data_))
+            {
+                std::swap(b->data_, b->prev_->data_);
+                b = b->prev_;
             }
             cur = cur->next_;
         }
