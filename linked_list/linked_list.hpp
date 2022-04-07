@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <iterator>
 
 template<typename T>
 class Node {
@@ -14,6 +15,7 @@ public:
     T data_;
 
     Node() = default;
+    ~Node() = default;
 
     Node(T val): data_{val}, next_{}, prev_{} {};
 };
@@ -39,29 +41,26 @@ private:
     Node<T>* head_;
     Node<T>* tail_;
 
-
-    void insert_after_(T&& val, Node<T>& prev) {
+    void insert_after_(T&& val, Node<T>* prev) {
         // NOTE: that this make not possible
         // to insert into empty list
         if (prev == nullptr) {
             return;
         }
 
-        const auto& node = std::make_shared<Node<T>>(
-                * (new Node{std::move(val)})
-        );
+        const auto& node = new Node{std::move(val)};
 
-        node->next = prev.next_;
-        prev.next_ = node;
+        node->next_ = prev->next_;
+        prev->next_ = node;
         node->prev_ = prev;
         if (node->next_ != nullptr) {
             node->next_->prev_ = node;
         }
     }
 
-    Node<T> remove_(Node<T>& node) {
+    Node<T> remove_(Node<T>* node) {
         if (node == nullptr) {
-            return;
+            throw std::runtime_error("could not remove nullptr node");
         }
 
         if (node->next_ != nullptr) {
@@ -69,17 +68,13 @@ private:
         }
 
         if (node->prev_ != nullptr) {
-            node->prev->next = node->next_;
+            node->prev_->next_ = node->next_;
         }
 
-        return node;
-    }
+        auto rtn = *node;
+        // TODO: memory leak here
 
-    // TODO: bad coupling
-    void swap(Node<T>& a, Node<T>& b) {
-        std::swap(a.data_, b.data_);
-        std::swap(a.prev_, b.prev_);
-        std::swap(a.next_, b.next_);
+        return rtn;
     }
 
 public:
@@ -115,6 +110,25 @@ public:
         tail_ = node;
     }
 
+    template<class Arg>
+    void insert(Arg&& val, size_t pos) {
+        if (pos == 0) {
+            push_front(std::forward<Arg>(val));
+            return;
+        }
+        auto it = this->begin();
+        std::advance(it, pos - 1);
+
+        insert_after_(std::forward<Arg>(val), *it);
+    }
+
+    Node<T> remove(size_t pos) {
+        auto it = this->begin();
+        std::advance(it, pos);
+
+        return remove_(*it);
+    }
+
     template<class Compare>
     void sort(Compare comp) {
         if (head_ == nullptr || head_ == tail_) {
@@ -144,10 +158,10 @@ public:
         Node<T>* curr_;
 
     public:
-        LLIterator(Node<T>& node): curr_{node} {}
+        LLIterator(Node<T>* node): curr_{node} {}
 
-        Node<T> operator*() const {
-            return *curr_;
+        Node<T>* operator*() {
+            return curr_;
         }
 
         LLIterator& operator++() {
@@ -157,18 +171,18 @@ public:
 
         LLIterator operator++(int) {
             if (curr_)
-                return LLIterator{curr_->next};
+                return LLIterator{curr_->next_};
             return nullptr;
         }
 
         LLIterator& operator--() {
-            if (curr_) curr_ = curr_->prev;
+            if (curr_) curr_ = curr_->prev_;
             return *this;
         }
 
         LLIterator operator--(int) {
             if (curr_)
-                return LLIterator{curr_->prev};
+                return LLIterator{curr_->prev_};
             return nullptr;
         }
 
@@ -190,11 +204,11 @@ public:
         }
     };
 
-    LLIterator begin() {
+    LLIterator begin() const {
         return LLIterator{head_};
     }
 
-    LLIterator end() {
+    LLIterator end() const {
         return LLIterator{nullptr};
     }
 };

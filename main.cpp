@@ -29,5 +29,10 @@ int main(int argc, char* argv[]) {
 
     std::cout << a << std::endl;
 
+    a.insert(10, 2);
+    a.remove(3);
+
+    std::cout << a << std::endl;
+
     return 0;
 }
