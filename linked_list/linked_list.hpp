@@ -9,8 +9,8 @@
 template<typename T>
 class Node {
 public:
-    std::shared_ptr<Node> next_;
-    std::shared_ptr<Node> prev_;
+    Node* next_;
+    Node* prev_;
     T data_;
 
     Node() = default;
@@ -25,7 +25,7 @@ bool operator==(Node<T> lhs, Node<T> rhs) {
 
 template<typename T>
 bool operator<=>(Node<T> lhs, Node<T> rhs) {
-    return lhs.data_ <=> rhs.data_;
+    return &lhs <=> &rhs;
 }
 
 template<typename T>
@@ -36,8 +36,8 @@ std::ostream& operator<<(std::ostream& os, Node<T> node) {
 template<typename T>
 class LinkedList {
 private:
-    std::shared_ptr<Node<T>> head_;
-    std::shared_ptr<Node<T>> tail_;
+    Node<T>* head_;
+    Node<T>* tail_;
 
 
     void insert_after_(T&& val, Node<T>& prev) {
@@ -75,58 +75,20 @@ private:
         return node;
     }
 
-    // TODO: not sure that this is located in right place
-    // bad coupling
+    // TODO: bad coupling
     void swap(Node<T>& a, Node<T>& b) {
         std::swap(a.data_, b.data_);
-        std::swap(a.next_, b.next_);
         std::swap(a.prev_, b.prev_);
-    }
-
-    template<class Comparer>
-    void helper_(Node<T>& head_, Node<T>& tail_, Comparer comp)
-    {
-        if (head_ == tail_) {
-            return;
-        }
-
-        auto& pivot = tail_;
-        auto& cur = head_;
-
-        while (*cur.next_ != pivot) {
-            // TODO: not sure that it should be > 0 here
-            if (comp(cur.data_, pivot.data_) > 0) {
-                swap(*pivot.prev_,  pivot);
-                swap(pivot, cur);
-                pivot = *pivot.prev_;
-            } else {
-                cur = *cur.next_;
-            }
-        }
-
-        if (comp(cur.data_, pivot.data_) > 0) {
-            swap(cur,  pivot);
-            pivot = cur;
-        }
-
-        if (head_ != pivot) {
-            helper_(head_, *pivot.prev_, comp);
-        }
-
-        if (tail_ != pivot) {
-            helper_(*pivot.next_,  tail_, comp);
-        }
+        std::swap(a.next_, b.next_);
     }
 
 public:
 
-    std::shared_ptr<Node<T>> head() const { return head_; }
-    std::shared_ptr<Node<T>> tail() const { return tail_; }
+    Node<T>* head() const { return head_; }
+    Node<T>* tail() const { return tail_; }
 
     void push_front(T&& val) {
-        const auto& node = std::make_shared<Node<T>>(
-                * (new Node{std::move(val)})
-                );
+        const auto& node = new Node{std::move(val)};
         if (head_ == nullptr) {
             head_ = node;
             tail_ = node;
@@ -138,9 +100,7 @@ public:
     }
 
     void push_back(T&& val) {
-        const auto &node = std::make_shared<Node<T>>(
-                *(new Node{std::move(val)})
-        );
+        const auto &node = new Node{std::move(val)};
 
         if (head_ == nullptr) {
             head_ = node;
@@ -157,24 +117,34 @@ public:
 
     template<class Compare>
     void sort(Compare comp) {
-        if (head_ == tail_) {
+        if (head_ == nullptr || head_ == tail_) {
             return;
         }
 
-        if (head_ == nullptr || tail_ == nullptr) {
+        if (tail_ == nullptr) {
+            // TODO: comes from assumption that tail cannot be null, check this
             throw new std::runtime_error("bad linked list passed to sort func");
         }
 
-        helper_(*head_, *tail_, comp);
+        auto cur = head_;
+        while (cur != nullptr) {
+            auto b = cur->next_;
+            while (b != nullptr && b->prev_  != nullptr && \
+                   comp(b->data_, b->prev_->data_)) {
+                   std::swap(b->data_, b->prev_->data_);
+                    b = b->prev_;
+            }
+            cur = cur->next_;
+        }
     }
 
     class LLIterator : public std::iterator<std::bidirectional_iterator_tag, Node<T>>{
 
     private:
-        std::shared_ptr<Node<T>> curr_;
+        Node<T>* curr_;
 
     public:
-        LLIterator(std::shared_ptr<Node<T>> node): curr_{node} {}
+        LLIterator(Node<T>& node): curr_{node} {}
 
         Node<T> operator*() const {
             return *curr_;
@@ -202,7 +172,7 @@ public:
             return nullptr;
         }
 
-        LLIterator& operator=(std::shared_ptr<Node<T>> node) {
+        LLIterator& operator=(Node<T>& node) {
             curr_ = node;
             return *this;
         }
@@ -216,7 +186,7 @@ public:
                 return true;
             }
 
-            return other_curr.get() == curr_.get();
+            return other_curr == curr_;
         }
     };
 
@@ -233,8 +203,8 @@ template<typename T>
 std::ostream& operator<<(std::ostream& os, LinkedList<T> ll) {
     auto current = ll.head();
     while (current != nullptr) {
-        os << *current.get();
-        current = current.get()->next_;
+        os << *current;
+        current = current->next_;
         if (current != nullptr) os << " -> ";
     }
 
