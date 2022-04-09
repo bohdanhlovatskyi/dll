@@ -6,7 +6,8 @@ Author: <mark>Bohdan Hlovatskyi</mark><br>
 ### Compilation
 
 ```sh
-./compile.sh
+./compile.sh -R 
+# here -R will remove intermediate build directories, look at other options in the script
 
 # or directly via cmake
 mkdir build

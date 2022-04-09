@@ -4,6 +4,8 @@
 
 test/build
 
+MemTracker
+
 # Compiled Object files
 *.slo
 *.lo

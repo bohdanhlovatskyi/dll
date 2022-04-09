@@ -36,6 +36,7 @@ LinkedList<std::pair<char, int>> ll;
 int main(int argc, char* argv[]) {
     (void) argc; (void) argv;
 
+    // usage_example();
     Test1();
     Test2();
     Test3();
@@ -89,6 +90,8 @@ void usage_example() {
     a.push_back(2);
     a.push_back(8);
     a.push_back(5);
+
+    a.insert(4, 3);
 
     std::cout << a << std::endl;
 

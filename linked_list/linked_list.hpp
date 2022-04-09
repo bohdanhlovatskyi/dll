@@ -8,6 +8,10 @@
 #include <iterator>
 
 template<typename T>
+// TODO: this should not be available (consider using namespaces)
+// TODD: this one possibly introduces memory leaks, as it does not
+// frees pointers -> good approach here would be to use smart pointers
+// though I ran out of time for that ((
 class Node {
 public:
     Node* next_;
@@ -58,6 +62,7 @@ private:
         }
     }
 
+    // note that responsible for memory freeing becomes the caller
     Node<T> remove_(Node<T>* node) {
         if (node == nullptr) {
             throw std::runtime_error("could not remove nullptr node");
@@ -72,7 +77,6 @@ private:
         }
 
         auto rtn = *node;
-        // TODO: memory leak here
 
         return rtn;
     }
@@ -110,7 +114,7 @@ public:
         tail_ = node;
     }
 
-    template<class Arg>
+    template<typename Arg>
     void insert(Arg&& val, size_t pos) {
         if (pos == 0) {
             push_front(std::forward<Arg>(val));
