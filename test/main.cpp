@@ -7,21 +7,23 @@
 #include "../linked_list/linked_list.hpp"
 
 TEST(TestLinkedList, TestInsert) {
+    int data = 2;
     LinkedList<int> ll{};
     ll.push_front(3);
     ll.push_back(4);
-    ll.insert(2, 1);
+    ll.insert(data, 1);
     auto node = ll.remove(1);
-    ASSERT_EQ(2, node.data_);
+    ASSERT_EQ(data, node.data_);
 }
 
 TEST(TestLinkedList, TestRemoveIf) {
+    int data = 2;
     LinkedList<int> ll{};
     ll.push_front(3);
     ll.push_back(4);
-    ll.insert(2, 1);
-    auto node = ll.remove_if([](const auto& elm){ return elm->data_ == 2; });
-    ASSERT_EQ(2, node.data_);
+    ll.insert(data, 1);
+    auto node = ll.remove_if([data](const auto& elm){ return elm->data_ == data; });
+    ASSERT_EQ(data, node.data_);
 }
 
 TEST(TestLinkedList, TestSort) {

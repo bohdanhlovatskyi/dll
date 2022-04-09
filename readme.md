@@ -1,5 +1,8 @@
 # Lab work <mark>1</mark>: <mark>Doubly linked list</mark>
 Author: <mark>Bohdan Hlovatskyi</mark><br>
+
+Presentation: https://youtu.be/C1JVsdnGBew
+
 ## Prerequisites
 - C++20
 - Gtest

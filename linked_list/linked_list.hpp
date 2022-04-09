@@ -45,14 +45,15 @@ private:
     Node<T>* head_;
     Node<T>* tail_;
 
-    void insert_after_(T&& val, Node<T>* prev) {
+    template<typename Arg>
+    void insert_after_(Arg&& val, Node<T>* prev) {
         // NOTE: that this make not possible
         // to insert into empty list
         if (prev == nullptr) {
             return;
         }
 
-        const auto& node = new Node{std::move(val)};
+        const auto& node = new Node{std::forward<Arg>(val)};
 
         node->next_ = prev->next_;
         prev->next_ = node;
@@ -86,8 +87,9 @@ public:
     Node<T>* head() const { return head_; }
     Node<T>* tail() const { return tail_; }
 
-    void push_front(T&& val) {
-        const auto& node = new Node{std::move(val)};
+    template<typename Arg>
+    void push_front(Arg&& val) {
+        const auto& node = new Node{std::forward<Arg>(val)};
         if (head_ == nullptr) {
             head_ = node;
             tail_ = node;
@@ -98,8 +100,9 @@ public:
         }
     }
 
-    void push_back(T&& val) {
-        const auto &node = new Node{std::move(val)};
+    template<typename Arg>
+    void push_back(Arg&& val) {
+        const auto &node = new Node{std::forward<Arg>(val)};
 
         if (head_ == nullptr) {
             head_ = node;
